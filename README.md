@@ -273,3 +273,78 @@ DB = 'mongodb+srv://<username>:<password>@<network-address>/<dbname>?retryWrites
 Make sure to update "<username, <password, <network-address" and <database according to your setup.
 
 
+We need to update the `index.js` to reflect the use of `.env` so that Node.js can connect to the database.
+
+To do that we open the `index.js` file and delete the content using "esc" then ":%d" then "enter".
+
+We then replace then content with the following codes:
+```
+const express = require('express');
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+const routes = require('./routes/api');
+const path = require('path');
+require('dotenv').config();
+
+const app = express();
+
+const port = process.env.PORT || 5000;
+
+//connect to the database
+mongoose.connect(process.env.DB, { useNewUrlParser: true, useUnifiedTopology: true })
+.then(() => console.log(`Database connected successfully`))
+.catch(err => console.log(err));
+
+//since mongoose promise is depreciated, we overide it with node's promise
+mongoose.Promise = global.Promise;
+
+app.use((req, res, next) => {
+res.header("Access-Control-Allow-Origin", "\*");
+res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+next();
+});
+
+app.use(bodyParser.json());
+
+app.use('/api', routes);
+
+app.use((err, req, res, next) => {
+console.log(err);
+next();
+});
+
+app.listen(port, () => {
+console.log(`Server running on port ${port}`)
+});
+```
+![alt text](images/3.16.png)
+
+It is more secure to use environment variables to store information so as to separate configuration and secret data from the application, instead of writing connection strings directly inside the index.js application file.
+
+We start our server by running the command:
+```
+node index.js
+```
+If the setup has no errors, we should see **"Database connected successfully"**.
+
+![alt text](images/3.17.jpg)
+
+### Testing Backend Code Using Postman
+
+So far, we have built the backend of our application and in order to test to see if it works without a frontend, we use postman to test the endpoints.
+
+On Postman, we make a POST request to our database whilst specifying an action in the body of the request.
+
+![alt text](images/3.18.jpg)
+
+![alt text](images/3.19.png)
+
+Then We make a GET request to see if we can get back what has been posted into the database.
+
+![alt text](images/3.20.jpg)
+
+We can also make a delete request which deletes and entry using the id of each entry.
+
+![alt text](images/3.21.jpg)
+
+![alt text](images/3.22.png)
