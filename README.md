@@ -221,3 +221,55 @@ Todo.findOneAndDelete({"_id": req.params.id})
 module.exports = router;
 ```
 
+### Creating a MongoDB Database
+
+We use MongoDB Database to store our data using mLab which provides Database as a service (DBaas) solution.
+
+To continue, we sign up [here](https://account.mongodb.com/account/register?signedOut=true).
+
+Follow the sign up process, select AWS as the cloud provider, and choose a region near you.
+
+![alt text](images/3.9.png)
+
+Go to **"Network access"**, select **"Allow access from anywhere"**. This is not secure but good for testing purposes.
+
+![alt text](images/3.10.png)
+
+Then change the time of deleting the entry from 6 Hours to 1 Week.
+
+![alt text](images/3.11.png)
+
+Create a `MongoDB database` and collection inside mLab by clicking on `database`, click on `cluster0` and then open `collections`.
+
+![alt text](images/3.12.png)
+
+
+To get the connection string, we click on `cluster0` then click on `connect`
+
+![alt text](images/3.13.png)
+
+Then we click on `Mongodb drivers` ...connect your application..."
+
+![alt text](images/3.14.png)
+
+We then copy then connection string displayed into the .env file.
+
+![alt text](images/3.15.png)
+
+In the `index.js` file, we specified `process.env` to access environment variables, but we are yet to create this file.
+
+To create the process.env file, we creta a file in Todo directory and name it .env.
+```
+touch .env
+```
+Open the file
+```
+vim .env
+```
+Add the connection string to access the database in it, just as below:
+```
+DB = 'mongodb+srv://<username>:<password>@<network-address>/<dbname>?retryWrites=true&w=majority'
+```
+Make sure to update "<username, <password, <network-address" and <database according to your setup.
+
+
