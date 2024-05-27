@@ -104,3 +104,120 @@ Paste our public ip address on the browser with the port to see if the server is
 
 ![alt text](images/3.7.png)
 
+### Defining Routes For our Application
+
+We will create a `routes` folder which will contain code pointing to the three main endpoints used in a todo application. This will contain the post,get and delete requests which will be helpful in interacting with our client_side and database via restful apis.
+```
+mkdir routes
+cd routes
+touch api.js
+```
+Write the The below code in api.js. It is an example of a simple route that fires various endpoints.
+```
+const express = require ('express');
+const router = express.Router();
+
+router.get('/todos', (req, res, next) => {
+
+});
+
+router.post('/todos', (req, res, next) => {
+
+});
+
+router.delete('/todos/:id', (req, res, next) => {
+
+})
+
+module.exports = router;
+```
+
+### Creating models
+
+We then go ahead to create **"Models"** since the application will be using **MongoDB** which is a noSQL database. A **Model** makes the javascript application interactive. We also use Models to define the **database schema** . This is important so that we will be able to define the fields stored in each Mongodb document.
+
+The **Schema** shows how the database will be setup, including other data fields that may not be required to be stored in the database.
+
+To create a `Schema` and a `model`, we will need to install **mongoose** which is a **Node.js** package that makes working with mongodb easier.
+
+To install Mongoose, we make sure we are in the Todo directory then run the command:
+```
+npm install mongoose
+```
+
+after that we go ahead to create a folder models by running the command:
+```
+mkdir models
+```
+Then we chaneg into the model directory:
+```
+cd models
+```
+Inside the models folder, create a file named todo.js
+```
+touch todo.js
+```
+We then open the todo.js file and paste the following codes:
+```
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+
+//create schema for todo
+const TodoSchema = new Schema({
+action: {
+type: String,
+required: [true, 'The todo text field is required']
+}
+})
+
+//create model for todo
+const Todo = mongoose.model('todo', TodoSchema);
+
+module.exports = Todo;
+```
+![alt text](images/3.8.png)
+
+Since we have defined a schema for how our database should be structured, we then update the code in our api.js to fire specific actions when an endpoint is called.
+```
+cd routes
+```
+Open the api.js file
+```
+vim api.js
+```
+
+We copy and paste the following codes into the file:
+```
+const express = require ('express');
+const router = express.Router();
+const Todo = require('../models/todo');
+
+router.get('/todos', (req, res, next) => {
+
+//this will return all the data, exposing only the id and action field to the client
+Todo.find({}, 'action')
+.then(data => res.json(data))
+.catch(next)
+});
+
+router.post('/todos', (req, res, next) => {
+if(req.body.action){
+Todo.create(req.body)
+.then(data => res.json(data))
+.catch(next)
+}else {
+res.json({
+error: "The input field is empty"
+})
+}
+});
+
+router.delete('/todos/:id', (req, res, next) => {
+Todo.findOneAndDelete({"_id": req.params.id})
+.then(data => res.json(data))
+.catch(next)
+})
+
+module.exports = router;
+```
+
